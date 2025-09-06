@@ -73,36 +73,36 @@ enum PaymentStatus {
 }
 
 model User {
-  id            Int    @id @default(autoincrement())
-  email         String    @unique
-  username      String    @unique
-  password      String
-  bio           String?
-  profilePic    String?
-  roles         Role[]    @default([GAMER])
-  activeRole    Role      @default(GAMER)
-  isEmailVerified Boolean  @default(false)
-  isActive      Boolean   @default(true)
-  lastLogin     DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id              Int       @id @default(autoincrement())
+  email           String    @unique
+  username        String    @unique
+  password        String
+  bio             String?
+  profilePic      String?
+  roles           Role[]    @default([GAMER])
+  activeRole      Role      @default(GAMER)
+  isEmailVerified Boolean   @default(false)
+  isActive        Boolean   @default(true)
+  lastLogin       DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   // Relations
-  assets        Asset[]       @relation("CreatorAssets")
-  purchases     Purchase[]
-  likes         Like[]
-  wishlist      Wishlist[]
-  followers     Follow[]      @relation("followers")
-  following     Follow[]      @relation("following")
-  sentMessages  Message[]     @relation("sentMessages")
-  receivedMessages Message[]   @relation("receivedMessages")
-  notifications Notification[]
-  reviews       Review[]
-  refreshTokens RefreshToken[]
+  assets           Asset[]        @relation("CreatorAssets")
+  purchases        Purchase[]
+  likes            Like[]
+  wishlist         Wishlist[]
+  followers        Follow[]       @relation("followers")
+  following        Follow[]       @relation("following")
+  sentMessages     Message[]      @relation("sentMessages")
+  receivedMessages Message[]      @relation("receivedMessages")
+  notifications    Notification[]
+  reviews          Review[]
+  refreshTokens    RefreshToken[]
 
   // V2 Blockchain Relations
-  ownerships     Ownership[]   @relation("UserOwnerships")
-  soldTransactions Transaction[] @relation("TransactionsSeller")
+  ownerships         Ownership[]   @relation("UserOwnerships")
+  soldTransactions   Transaction[] @relation("TransactionsSeller")
   boughtTransactions Transaction[] @relation("TransactionsBuyer")
 
   // Optimized indexes
@@ -113,25 +113,22 @@ model User {
 }
 
 model Asset {
-  id            String      @id @default(uuid())
-  title         String
-  description   String
-  type          AssetType
+  id          String    @id @default(uuid())
+  title       String
+  description String
+  type        AssetType
 
   // Structured metadata for filtering
-  game          String?
-  rarity        Rarity?
-  style         Style?
-  modType       ModType?
+  game    String?
+  rarity  Rarity?
+  style   Style?
+  modType ModType?
+  tags String[]
 
-  // Flexible tagging system
-  tags          String[]
-
-  // Additional metadata as JSON for extensibility
-  metadata      Json?       // Store additional properties like polyCount, textureSize, rigged, etc.
+  metadata Json? // Store additional properties like polyCount, textureSize, rigged, etc.
 
   price         Float
-  discountPrice Float?      // Keep for V2
+  discountPrice Float?
   thumbnail     String
   previewUrl    String?
   fileUrl       String
@@ -143,24 +140,24 @@ model Asset {
   likeCount     Int         @default(0)
 
   // Version control for updates
-  version       String      @default("1.0.0")
+  version String @default("1.0.0")
 
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  creatorId     Int
-  creator       User        @relation("CreatorAssets", fields: [creatorId], references: [id])
-  purchases     Purchase[]
-  likes         Like[]
-  wishlist      Wishlist[]
-  categories    Category[]  @relation()
-  reviews       Review[]
-  assets        AssetFile[]
+  creatorId  Int
+  creator    User        @relation("CreatorAssets", fields: [creatorId], references: [id])
+  purchases  Purchase[]
+  likes      Like[]
+  wishlist   Wishlist[]
+  categories Category[]  @relation()
+  reviews    Review[]
+  assets     AssetFile[]
 
   // V2 Blockchain Relations
-  ownerships    Ownership[] @relation("AssetOwnerships")
-  transactions  Transaction[] @relation("AssetTransactions")
+  ownerships   Ownership[]   @relation("AssetOwnerships")
+  transactions Transaction[] @relation("AssetTransactions")
 
   // Optimized indexes for filtering and sorting
   @@index([status, isFeatured])
@@ -181,33 +178,33 @@ model Asset {
 }
 
 model AssetFile {
-  id          Int   @id @default(autoincrement())
-  name        String
-  url         String
-  fileType    String
-  fileSize    Int
-  isPrimary   Boolean  @default(false)
-  assetId     String
-  asset       Asset    @relation(fields: [assetId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  name      String
+  url       String
+  fileType  String
+  fileSize  Int
+  isPrimary Boolean  @default(false)
+  assetId   String
+  asset     Asset    @relation(fields: [assetId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Category {
-  id          Int   @id @default(autoincrement())
-  name        String   @unique
-  slug        String   @unique
+  id          Int        @id @default(autoincrement())
+  name        String     @unique
+  slug        String     @unique
   description String?
   assets      Asset[]
   parentId    Int?
   parent      Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
   children    Category[] @relation("CategoryHierarchy")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 }
 
 model Purchase {
-  id            Int   @id @default(autoincrement())
+  id            Int      @id @default(autoincrement())
   userId        Int
   user          User     @relation(fields: [userId], references: [id])
   assetId       String
@@ -224,26 +221,26 @@ model Purchase {
 
 // V2 Blockchain Support Models
 model Ownership {
-  id            Int    @id @default(autoincrement())
-  userId        Int
-  user          User      @relation("UserOwnerships", fields: [userId], references: [id])
-  assetId       String
-  asset         Asset     @relation("AssetOwnerships", fields: [assetId], references: [id])
-  tokenId       String?   // NFT token ID if blockchain
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  user            User     @relation("UserOwnerships", fields: [userId], references: [id])
+  assetId         String
+  asset           Asset    @relation("AssetOwnerships", fields: [assetId], references: [id])
+  tokenId         String? // NFT token ID if blockchain
   contractAddress String? // Smart contract address
-  quantity      Int       @default(1) // For limited edition assets
-  acquiredAt    DateTime  @default(now())
-  isActive      Boolean   @default(true) // False when sold/transferred
-  
+  quantity        Int      @default(1) // For limited edition assets
+  acquiredAt      DateTime @default(now())
+  isActive        Boolean  @default(true) // False when sold/transferred
+
   // Blockchain metadata
   blockchainTxHash String?
   blockNumber      Int?
-  
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  transactions  Transaction[]
+  transactions Transaction[]
 
   @@unique([userId, assetId, tokenId])
   @@index([userId])
@@ -251,34 +248,34 @@ model Ownership {
 }
 
 model Transaction {
-  id              Int      @id @default(autoincrement())
-  type            TransactionType
-  
+  id   Int             @id @default(autoincrement())
+  type TransactionType
+
   // Parties involved
-  sellerId        Int?
-  seller          User?       @relation("TransactionsSeller", fields: [sellerId], references: [id])
-  buyerId         Int
-  buyer           User        @relation("TransactionsBuyer", fields: [buyerId], references: [id])
-  
+  sellerId Int?
+  seller   User? @relation("TransactionsSeller", fields: [sellerId], references: [id])
+  buyerId  Int
+  buyer    User  @relation("TransactionsBuyer", fields: [buyerId], references: [id])
+
   // Asset details
-  assetId         String
-  asset           Asset       @relation("AssetTransactions", fields: [assetId], references: [id])
-  ownershipId     Int?
-  ownership       Ownership?  @relation(fields: [ownershipId], references: [id])
-  
+  assetId     String
+  asset       Asset      @relation("AssetTransactions", fields: [assetId], references: [id])
+  ownershipId Int?
+  ownership   Ownership? @relation(fields: [ownershipId], references: [id])
+
   // Financial
-  amount          Float
-  platformFee     Float       @default(0)
-  creatorRoyalty  Float       @default(0)
-  
+  amount         Float
+  platformFee    Float @default(0)
+  creatorRoyalty Float @default(0)
+
   // Payment & Blockchain
-  paymentMethod   String?
-  paymentStatus   PaymentStatus @default(PENDING)
+  paymentMethod    String?
+  paymentStatus    PaymentStatus @default(PENDING)
   blockchainTxHash String?
-  blockNumber     Int?
-  
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  blockNumber      Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([sellerId])
   @@index([buyerId])
@@ -287,9 +284,9 @@ model Transaction {
 
 model Like {
   userId    Int
-  user      User   @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
   assetId   String
-  asset     Asset  @relation(fields: [assetId], references: [id])
+  asset     Asset    @relation(fields: [assetId], references: [id])
   createdAt DateTime @default(now())
 
   @@id([userId, assetId])
@@ -297,9 +294,9 @@ model Like {
 
 model Wishlist {
   userId    Int
-  user      User   @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
   assetId   String
-  asset     Asset  @relation(fields: [assetId], references: [id])
+  asset     Asset    @relation(fields: [assetId], references: [id])
   createdAt DateTime @default(now())
 
   @@id([userId, assetId])
@@ -307,16 +304,16 @@ model Wishlist {
 
 model Follow {
   followerId  Int
-  follower    User   @relation("followers", fields: [followerId], references: [id])
+  follower    User     @relation("followers", fields: [followerId], references: [id])
   followingId Int
-  following   User   @relation("following", fields: [followingId], references: [id])
+  following   User     @relation("following", fields: [followingId], references: [id])
   createdAt   DateTime @default(now())
 
   @@id([followerId, followingId])
 }
 
 model Review {
-  id        Int   @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   rating    Int
   comment   String?
   userId    Int
@@ -330,19 +327,19 @@ model Review {
 }
 
 model Message {
-  id           Int   @id @default(autoincrement())
-  content      String
-  senderId     Int
-  sender       User     @relation("sentMessages", fields: [senderId], references: [id])
-  recipientId  Int
-  recipient    User     @relation("receivedMessages", fields: [recipientId], references: [id])
-  isRead       Boolean  @default(false)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  content     String
+  senderId    Int
+  sender      User     @relation("sentMessages", fields: [senderId], references: [id])
+  recipientId Int
+  recipient   User     @relation("receivedMessages", fields: [recipientId], references: [id])
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Notification {
-  id        Int   @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   userId    Int
   user      User     @relation(fields: [userId], references: [id])
   title     String
@@ -354,11 +351,11 @@ model Notification {
 }
 
 model RefreshToken {
-  id          Int   @id @default(autoincrement())
-  userId      Int
-  user        User     @relation(fields: [userId], references: [id])
-  token       String   @unique
-  expiresAt   DateTime
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
