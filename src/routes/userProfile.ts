@@ -1,5 +1,5 @@
 import express from 'express';
-import { PrismaClient, Role } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { authMiddleWare } from '../middleware/authMiddleWare';
 import { updateUserProfile } from '../config/user.profileUpdate';
 
@@ -175,6 +175,6 @@ router.delete("/api/deleteUser", authMiddleWare, async(req, res) => {
         return res.status(500).json({error: "Internal server error"})
     }
 })
-  
+
 
 export default router;
