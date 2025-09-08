@@ -4,6 +4,7 @@ import { loginSchema, signupSchema } from '../config/auth.config';
 import bcrypt from 'bcrypt';
 import jwt, { type SignOptions } from 'jsonwebtoken';
 import { config } from '../config';
+import { authMiddleWare } from '../middleware/authMiddleWare';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -85,4 +86,33 @@ router.post("/api/auth/login", async(req, res) => {
     }
 })
 
+router.post("/api/auth/logout", authMiddleWare, async(req, res) => {
+    try {
+        const user = await prisma.user.update({
+            where: {
+                id: req.user.id
+            },
+            data: {
+                isActive: false
+            },
+            select: {
+                id: true,
+                email: true,
+                username: true,
+                password: true,
+                roles: true,
+                activeRole: true,
+                isEmailVerified: true,
+                isActive: true,
+                lastLogin: true,
+                createdAt: true
+            }
+        })
+        const {password: _, ...safeUser} = user;
+        return res.status(200).json({message: "Logout successful!", user:safeUser});
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({error: "Internal server error"})
+    }
+})
 export default router
