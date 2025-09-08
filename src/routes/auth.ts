@@ -1,5 +1,4 @@
 import express from 'express'
-import { Router } from 'express'
 import {PrismaClient, Role} from '@prisma/client'
 import { loginSchema, signupSchema } from '../config/auth.config';
 import bcrypt from 'bcrypt';
