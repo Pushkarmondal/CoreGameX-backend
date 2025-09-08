@@ -160,7 +160,21 @@ router.post("/api/enableUserRoles", authMiddleWare, async (req, res) => {
       console.error(error);
       return res.status(500).json({ error: "Internal server error" });
     }
-  });
+});
+
+router.delete("/api/deleteUser", authMiddleWare, async(req, res) => {
+    try {
+        const deleteUser = await prisma.user.delete({
+            where: {
+                id: req.user.id
+            }
+        })
+        return res.status(200).json({message: "User deleted successfully!"})
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({error: "Internal server error"})
+    }
+})
   
 
 export default router;
