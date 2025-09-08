@@ -1,6 +1,7 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { authMiddleWare } from '../middleware/authMiddleWare';
+import { updateUserProfile } from '../config/user.profileUpdate';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -33,6 +34,45 @@ router.get("/api/userProfile", authMiddleWare, async(req, res) => {
         return res.status(200).json({message: "User profile fetched successfully!", user: safeUser})
     } catch (error) {
         console.log(error)
+        return res.status(500).json({error: "Internal server error"})
+    }
+})
+
+router.put("/api/updateUserProfile", authMiddleWare, async(req, res) => {
+    try {
+        const {email, username, bio, profilePic} = updateUserProfile.parse(req.body);
+        if(!email || !username || !bio || !profilePic) {
+            return res.status(400).json({error: "Invalid details!"})
+        }
+        const profileUpdate = await prisma.user.update({
+            where: {
+                id: req.user.id
+            },
+            data: {
+                email,
+                username,
+                bio,
+                profilePic
+            },
+            select: {
+                id: true,
+                email: true,
+                username: true,
+                password: true,
+                bio: true,
+                profilePic: true,
+                roles: true,
+                activeRole: true,
+                isEmailVerified: true,
+                isActive: true,
+                lastLogin: true,
+                createdAt: true,
+            }
+        })
+        const {password: _, ...safeUser} = profileUpdate
+        return res.status(200).json({message: "User profile updated successfully!", profileUpdate: safeUser})
+    } catch (error) {
+        console.log(error);
         return res.status(500).json({error: "Internal server error"})
     }
 })
