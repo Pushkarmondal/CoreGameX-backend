@@ -2,6 +2,94 @@
 
 CoreGameX is a marketplace for game assets where creators can publish and sell their 3D models, textures, and other game development assets, and gamers/developers can discover and purchase them.
 
+## 📁 Project Structure(completed as per now)
+
+```
+backend/
+├── src/
+│   ├── config/                    # Configuration files
+│   │   ├── assets.config.ts       # Asset validation schemas
+│   │   ├── auth.config.ts         # Auth configuration
+│   │   └── user.profileUpdate.ts  # User profile update schemas
+│   │
+│   ├── middleware/                # Express middleware
+│   │   └── authMiddleWare.ts      # Authentication middleware
+│   │
+│   ├── routes/                    # API route handlers
+│   │   ├── assetRoutes.ts         # Asset management routes
+│   │   ├── auth.ts                # Authentication routes
+│   │   └── userProfile.ts         # User profile routes
+│   │
+│   ├── types/                     # TypeScript type definitions
+│   │   └── user.d.ts              # User type extensions
+│   │
+│   ├── config.ts                  # Main configuration
+│   └── server.ts                  # Server entry point
+│
+├── prisma/                       # Database schema and migrations
+│   └── schema.prisma
+│
+├── .env.example                  # Example environment variables
+└── package.json
+```
+
+## 🚀 API Endpoints
+
+### Authentication
+
+- `POST /api/register` - Register a new user
+- `POST /api/login` - User login
+- `POST /api/refresh-token` - Refresh access token
+- `POST /api/logout` - User logout
+
+### User Profile
+
+- `GET /api/profile` - Get user profile
+- `PUT /api/profile` - Update user profile
+
+### Assets
+
+- `POST /api/createAsset` - Create a new asset
+  ```json
+  {
+    "title": "Fantasy Sword",
+    "description": "A high-poly fantasy sword with glowing runes",
+    "type": "MODEL_3D",
+    "game": "Fantasy RPG",
+    "rarity": "RARE",
+    "style": "REALISTIC",
+    "modType": "WEAPON",
+    "tags": ["sword", "fantasy", "weapon", "3d-model"],
+    "price": 29.99,
+    "discountPrice": 19.99,
+    "thumbnail": "https://example.com/thumbnails/sword.jpg",
+    "previewUrl": "https://example.com/previews/sword.glb",
+    "fileUrl": "https://example.com/files/sword.fbx",
+    "fileSize": 5242880,
+    "status": "PUBLISHED",
+    "isFeatured": true,
+    "version": "1.0.0",
+    "metadata": {
+      "polyCount": 15000,
+      "vertexCount": 10000,
+      "triangleCount": 16000,
+      "rigged": true,
+      "animated": true
+    }
+  }
+  ```
+
+- `GET /api/getAssets` - Get all assets for the authenticated user
+
+## 🛠️ Tech Stack
+
+- **Runtime**: Bun (v1.2.17+)
+- **Framework**: Express.js
+- **Database**: PostgreSQL with Prisma ORM
+- **Authentication**: JWT
+- **Validation**: Zod
+- **Type Safety**: TypeScript
+
 ## 🚀 Features
 
 - **User Authentication & Authorization**
@@ -63,7 +151,12 @@ bun install
 ```
 
 ### 3. Set up environment variables
-Create a `.env` file in the `backend` directory:
+Copy the example environment file and update the values:
+```bash
+cp .env.example .env
+```
+
+Update the `.env` file with your configuration:
 ```env
 # App
 NODE_ENV=development
@@ -87,9 +180,6 @@ MAX_FILE_SIZE=52428800 # 50MB
 ```bash
 # Run database migrations
 bun prisma migrate dev
-
-# Seed initial data (optional)
-bun prisma db seed
 ```
 
 ### 5. Start the development server
@@ -97,7 +187,35 @@ bun prisma db seed
 bun run dev
 ```
 
-The server will start at `http://localhost:<PORT>`
+The server will be available at `http://localhost:<PORT>`
+
+## 🔒 Authentication
+
+All protected routes require a valid JWT token in the `Authorization` header:
+```
+Authorization: Bearer <your_jwt_token>
+```
+
+## 📝 API Examples
+
+### Create an Asset
+```bash
+curl -X POST http://localhost:<PORT>/api/createAsset \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -d '{
+    "title": "Medieval Shield",
+    "description": "A sturdy medieval shield with intricate designs",
+    "type": "MODEL_3D",
+    "price": 24.99
+  }'
+```
+
+### Get User's Assets
+```bash
+curl -X GET http://localhost:<PORT>/api/getAssets \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
 
 ## 📚 API Documentation
 
@@ -113,7 +231,7 @@ bun test
 bun test --watch
 ```
 
-## 🏗️ Project Structure
+## 🏗️ Project Structure(final)
 
 ```
 backend/
