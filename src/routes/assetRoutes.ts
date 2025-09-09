@@ -70,6 +70,27 @@ router.get("/api/getAssets", authMiddleWare, async(req, res) => {
     }
 })
 
+router.get("/api/getAsset/:id", authMiddleWare, async(req, res) => {
+    try {
+        const assetId = req.params.id;
+        const getAsset = await prisma.asset.findUnique({
+            where: {
+                id: assetId
+            }, select: {
+                id: true, title: true, description: true, type: true, game: true,
+                rarity: true, style: true, modType: true, tags: true, metadata: true,
+                price: true, discountPrice: true, thumbnail: true, previewUrl: true,
+                fileUrl: true, fileSize: true, status: true, isFeatured: true,
+                version: true, creatorId: true, createdAt: true,
+            }
+        })
+        return res.status(200).json({message: "Asset fetched successfully!", asset: getAsset})
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({error: "Internal server error"})
+    }
+})
+
 export default router
 
     
