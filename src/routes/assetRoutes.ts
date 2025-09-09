@@ -140,6 +140,51 @@ router.delete("/api/deleteAsset/:id", authMiddleWare, async(req, res) => {
         return res.status(500).json({error: "Internal server error"})
     }
 })
+
+router.get("/api/my-assets", authMiddleWare, async (req, res) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;   
+      const limit = parseInt(req.query.limit as string) || 10; 
+      const skip = (page - 1) * limit;
+      const published = req.query.published ? req.query.published === "true" : undefined;
+      const whereCondition: any = { creatorId: req.user.id };
+      if (published !== undefined) {
+        whereCondition.status = published ? "PUBLISHED" : "DRAFT"; 
+      }
+      const assets = await prisma.asset.findMany({
+        where: whereCondition,
+        select: {
+          id: true, title: true, description: true, type: true, game: true,
+          rarity: true, style: true, modType: true, tags: true, metadata: true,
+          price: true, discountPrice: true, thumbnail: true, previewUrl: true,
+          fileUrl: true, fileSize: true, status: true, isFeatured: true,
+          version: true, creatorId: true, createdAt: true,
+        },
+        skip,
+        take: limit,
+        orderBy: { createdAt: "desc" }
+      });
+  
+      const totalAssets = await prisma.asset.count({ where: whereCondition });
+  
+      return res.status(200).json({
+        message: "Assets fetched successfully!",
+        assets,
+        pagination: {
+          total: totalAssets,
+          page,
+          limit,
+          totalPages: Math.ceil(totalAssets / limit),
+          hasNextPage: page * limit < totalAssets,
+          hasPrevPage: page > 1,
+        }
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  });
+  
 export default router
 
     
